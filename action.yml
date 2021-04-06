@@ -1,11 +1,17 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Nx get affected apps action'
+description: '"Determines the affected apps in an Nx workspace'
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  base:
+    description: 'SHA to compare to'
+    default: 'origin/master~1'
+    required: false
+  head:
+    description: 'SHA to compare from'
+    default: 'origin/master'
+    required: false
+outputs:
+  affected_apps:
+    description: 'an array of affected app names'
 runs:
   using: 'node12'
   main: 'dist/index.js'
