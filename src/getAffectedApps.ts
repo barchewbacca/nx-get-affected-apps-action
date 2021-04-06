@@ -40,7 +40,7 @@ export function getAffectedApps({ base, head, workspace }: Props): string[] {
     return [];
   }
 
-  core.info(`BOOM... ${result}`);
+  core.info(`BOOM... ${JSON.stringify(result)}`);
 
   if (!result.includes('Affected apps:')) {
     throw Error(`NX Command Failed: ${result}`);
