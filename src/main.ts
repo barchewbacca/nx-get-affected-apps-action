@@ -1,19 +1,33 @@
-import * as core from '@actions/core'
-import {wait} from './wait'
+import * as core from '@actions/core';
+import { getAffectedApps } from './getAffectedApps';
 
-async function run(): Promise<void> {
+export async function run(workspace = '.'): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    const { GITHUB_WORKSPACE = workspace } = process.env;
+    const base = core.getInput('base');
+    const head = core.getInput('head');
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    // save base and head to env for later steps
+    core.exportVariable('NX_BASE', base || 'HEAD~1');
+    core.exportVariable('NX_HEAD', head || 'HEAD');
 
-    core.setOutput('time', new Date().toTimeString())
+    core.info(`Getting diff from ${base} to ${head || 'HEAD'}...`);
+    core.info(`using dir: ${GITHUB_WORKSPACE}`);
+
+    const apps = getAffectedApps({
+      base,
+      head,
+      workspace: GITHUB_WORKSPACE,
+    });
+
+    const appsString = JSON.stringify(apps);
+
+    core.setOutput('affected_apps', appsString);
+    core.exportVariable('NX_AFFECTED_APPS', appsString);
+    core.info(`Found these affected apps: \n ${appsString}`);
   } catch (error) {
-    core.setFailed(error.message)
+    core.setFailed(error.message);
   }
 }
 
-run()
+run();
