@@ -1,15 +1,23 @@
 import * as core from '@actions/core';
 import { execSync } from 'child_process';
 
-export function getAffectedApps({ base, head, workspace }: Props): string[] {
-  const args = `${base ? `--base=${base}` : ''} ${head ? `--head=${head}` : ''}`;
+interface Props {
+  base?: string;
+  head?: string;
+  workspace: string;
+}
+
+export function getAffectedApps({ base = '', head = '', workspace }: Props): string[] {
+  const args = `--base=${base} --head=${head} --plain`;
   let result;
+
   try {
-    const cmd = `npm run nx -- affected:apps ${args}`;
+    const cmd = `npm run nx affected:apps ${args}`;
     core.debug(`Attempting npm script: ${cmd}`);
     result = execSync(cmd, {
       cwd: workspace,
     }).toString();
+    core.info(`Testing out plain output: ${result}`);
   } catch (e) {
     core.debug(`first attempt failed: ${e.message}`);
     try {
@@ -54,10 +62,4 @@ export function getAffectedApps({ base, head, workspace }: Props): string[] {
     .filter(x => x.length > 0);
 
   return apps || [];
-}
-
-interface Props {
-  base?: string;
-  head?: string;
-  workspace: string;
 }

@@ -30,15 +30,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAffectedApps = void 0;
 const core = __importStar(__webpack_require__(186));
 const child_process_1 = __webpack_require__(129);
-function getAffectedApps({ base, head, workspace }) {
-    const args = `${base ? `--base=${base}` : ''} ${head ? `--head=${head}` : ''}`;
+function getAffectedApps({ base = '', head = '', workspace }) {
+    const args = `--base=${base} --head=${head} --plain`;
     let result;
     try {
-        const cmd = `npm run nx -- affected:apps ${args}`;
+        const cmd = `npm run nx affected:apps ${args}`;
         core.debug(`Attempting npm script: ${cmd}`);
         result = child_process_1.execSync(cmd, {
             cwd: workspace,
         }).toString();
+        core.info(`Testing out plain output: ${result}`);
     }
     catch (e) {
         core.debug(`first attempt failed: ${e.message}`);
