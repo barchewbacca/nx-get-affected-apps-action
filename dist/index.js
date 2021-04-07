@@ -33,11 +33,7 @@ const child_process_1 = __webpack_require__(129);
 function getAffectedApps({ base = '', head = '', workspace }) {
     let affectedApps;
     try {
-        affectedApps = child_process_1.execSync(`npx nx affected:apps --base=${base} --head=${head} --plain`, {
-            cwd: workspace,
-        })
-            .toString()
-            .trim();
+        affectedApps = child_process_1.execSync(`npx nx affected:apps --base=${base} --head=${head} --plain`).toString().trim();
     }
     catch (error) {
         core.info(`Running the Nx CLI failed with the error: ${error.message}`);
@@ -91,21 +87,20 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__webpack_require__(186));
 const getAffectedApps_1 = __webpack_require__(744);
-function run(workspace = '.') {
+function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { GITHUB_WORKSPACE = workspace } = process.env;
-            core.info(`Check ${process.env.GITHUB_WORKSPACE}`);
+            const workspace = process.env.GITHUB_WORKSPACE || '.';
             const base = core.getInput('base');
             const head = core.getInput('head');
             core.exportVariable('NX_BASE', base || 'HEAD~1');
             core.exportVariable('NX_HEAD', head || 'HEAD');
             core.info(`Getting diff from ${base || 'HEAD~1'} to ${head || 'HEAD'}`);
-            core.info(`Using dir: ${GITHUB_WORKSPACE}`);
+            core.info(`Using dir: ${workspace}`);
             const affectedApps = getAffectedApps_1.getAffectedApps({
                 base,
                 head,
-                workspace: GITHUB_WORKSPACE,
+                workspace,
             });
             core.setOutput('affected_apps', affectedApps);
             core.exportVariable('NX_AFFECTED_APPS', affectedApps);

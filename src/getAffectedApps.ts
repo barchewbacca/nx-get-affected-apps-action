@@ -11,11 +11,7 @@ export function getAffectedApps({ base = '', head = '', workspace }: ActionParam
   let affectedApps: string;
 
   try {
-    affectedApps = execSync(`npx nx affected:apps --base=${base} --head=${head} --plain`, {
-      cwd: workspace,
-    })
-      .toString()
-      .trim();
+    affectedApps = execSync(`npx nx affected:apps --base=${base} --head=${head} --plain`).toString().trim();
   } catch (error) {
     core.info(`Running the Nx CLI failed with the error: ${error.message}`);
     throw Error('Could not run the Nx CLI');

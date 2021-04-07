@@ -1,10 +1,9 @@
 import * as core from '@actions/core';
 import { getAffectedApps } from './getAffectedApps';
 
-export async function run(workspace = '.'): Promise<void> {
+export async function run(): Promise<void> {
   try {
-    const { GITHUB_WORKSPACE = workspace } = process.env;
-    core.info(`Check ${process.env.GITHUB_WORKSPACE}`);
+    const workspace = process.env.GITHUB_WORKSPACE || '.';
     const base = core.getInput('base');
     const head = core.getInput('head');
 
@@ -12,12 +11,12 @@ export async function run(workspace = '.'): Promise<void> {
     core.exportVariable('NX_HEAD', head || 'HEAD');
 
     core.info(`Getting diff from ${base || 'HEAD~1'} to ${head || 'HEAD'}`);
-    core.info(`Using dir: ${GITHUB_WORKSPACE}`);
+    core.info(`Using dir: ${workspace}`);
 
     const affectedApps = getAffectedApps({
       base,
       head,
-      workspace: GITHUB_WORKSPACE,
+      workspace,
     });
 
     core.setOutput('affected_apps', affectedApps);
