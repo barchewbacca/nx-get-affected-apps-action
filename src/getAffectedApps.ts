@@ -4,10 +4,9 @@ import { execSync } from 'child_process';
 interface ActionParams {
   base?: string;
   head?: string;
-  workspace: string;
 }
 
-export function getAffectedApps({ base = '', head = '', workspace }: ActionParams): string[] {
+export function getAffectedApps({ base = '', head = '' }: ActionParams): string[] {
   let affectedApps: string;
 
   try {

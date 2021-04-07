@@ -30,7 +30,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAffectedApps = void 0;
 const core = __importStar(__webpack_require__(186));
 const child_process_1 = __webpack_require__(129);
-function getAffectedApps({ base = '', head = '', workspace }) {
+function getAffectedApps({ base = '', head = '' }) {
     let affectedApps;
     try {
         affectedApps = child_process_1.execSync(`npx nx affected:apps --base=${base} --head=${head} --plain`).toString().trim();
@@ -90,17 +90,14 @@ const getAffectedApps_1 = __webpack_require__(744);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const workspace = process.env.GITHUB_WORKSPACE || '.';
             const base = core.getInput('base');
             const head = core.getInput('head');
             core.exportVariable('NX_BASE', base || 'HEAD~1');
             core.exportVariable('NX_HEAD', head || 'HEAD');
             core.info(`Getting diff from ${base || 'HEAD~1'} to ${head || 'HEAD'}`);
-            core.info(`Using dir: ${workspace}`);
             const affectedApps = getAffectedApps_1.getAffectedApps({
                 base,
                 head,
-                workspace,
             });
             core.setOutput('affected_apps', affectedApps);
             core.exportVariable('NX_AFFECTED_APPS', affectedApps);
