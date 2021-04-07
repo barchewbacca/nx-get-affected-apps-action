@@ -12,7 +12,7 @@ export function getAffectedApps({ base = '', head = '', workspace }: Props): str
   let result;
 
   try {
-    const cmd = `npm run nx -- affected:apps ${args}`;
+    const cmd = `npx nx affected:apps ${args}`;
     core.debug(`Attempting npm script: ${cmd}`);
     result = execSync(cmd, {
       cwd: workspace,

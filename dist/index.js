@@ -34,7 +34,7 @@ function getAffectedApps({ base = '', head = '', workspace }) {
     const args = `--base=${base} --head=${head} --plain`;
     let result;
     try {
-        const cmd = `npm run nx -- affected:apps ${args}`;
+        const cmd = `npx nx affected:apps ${args}`;
         core.debug(`Attempting npm script: ${cmd}`);
         result = child_process_1.execSync(cmd, {
             cwd: workspace,
