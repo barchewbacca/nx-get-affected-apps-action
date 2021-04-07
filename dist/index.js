@@ -68,7 +68,7 @@ function getAffectedApps({ base, head, workspace }) {
         core.info('Looks like no changes were found...');
         return [];
     }
-    core.info(`BOOM... ${result}`);
+    core.info(`BOOM... ${JSON.stringify(result)}`);
     if (!result.includes('Affected apps:')) {
         throw Error(`NX Command Failed: ${result}`);
     }
