@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function getAffectedApps({ base = '', head = '', workspace }: Props): string[] {
-  const args = `--base=${base} --head=${head} --plain`;
+  const args = `--base=${base} --plain`;
   let result;
 
   try {
@@ -16,7 +16,9 @@ export function getAffectedApps({ base = '', head = '', workspace }: Props): str
     core.debug(`Attempting npm script: ${cmd}`);
     result = execSync(cmd, {
       cwd: workspace,
-    }).toString();
+    })
+      .toString()
+      .trim();
     core.info(`Testing out plain output: ${result}`);
   } catch (e) {
     core.debug(`first attempt failed: ${e.message}`);
@@ -25,7 +27,9 @@ export function getAffectedApps({ base = '', head = '', workspace }: Props): str
       core.debug(`Attempting from node modules: ${cmd}`);
       result = execSync(cmd, {
         cwd: workspace,
-      }).toString();
+      })
+        .toString()
+        .trim();
     } catch (e2) {
       try {
         core.debug(`second attempt failed: ${e2.message}`);
@@ -33,7 +37,9 @@ export function getAffectedApps({ base = '', head = '', workspace }: Props): str
         core.debug(`Attempting global npm bin: ${cmd}`);
         result = execSync(cmd, {
           cwd: workspace,
-        }).toString();
+        })
+          .toString()
+          .trim();
       } catch (e3) {
         core.debug(`third attempt failed: ${e3.message}`);
         throw Error(
@@ -50,16 +56,7 @@ export function getAffectedApps({ base = '', head = '', workspace }: Props): str
 
   core.info(`BOOM... ${JSON.stringify(result)}`);
 
-  if (!result.includes('Affected apps:')) {
-    throw Error(`NX Command Failed: ${result}`);
-  }
+  const apps = result.split(' ');
 
-  const apps = result
-    .split('Affected apps:')[1]
-    .trim()
-    .split('- ')
-    .map(x => x.trim())
-    .filter(x => x.length > 0);
-
-  return apps || [];
+  return apps;
 }

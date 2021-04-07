@@ -31,14 +31,16 @@ exports.getAffectedApps = void 0;
 const core = __importStar(__webpack_require__(186));
 const child_process_1 = __webpack_require__(129);
 function getAffectedApps({ base = '', head = '', workspace }) {
-    const args = `--base=${base} --head=${head} --plain`;
+    const args = `--base=${base} --plain`;
     let result;
     try {
         const cmd = `npm run nx affected:apps ${args}`;
         core.debug(`Attempting npm script: ${cmd}`);
         result = child_process_1.execSync(cmd, {
             cwd: workspace,
-        }).toString();
+        })
+            .toString()
+            .trim();
         core.info(`Testing out plain output: ${result}`);
     }
     catch (e) {
@@ -48,7 +50,9 @@ function getAffectedApps({ base = '', head = '', workspace }) {
             core.debug(`Attempting from node modules: ${cmd}`);
             result = child_process_1.execSync(cmd, {
                 cwd: workspace,
-            }).toString();
+            })
+                .toString()
+                .trim();
         }
         catch (e2) {
             try {
@@ -57,7 +61,9 @@ function getAffectedApps({ base = '', head = '', workspace }) {
                 core.debug(`Attempting global npm bin: ${cmd}`);
                 result = child_process_1.execSync(cmd, {
                     cwd: workspace,
-                }).toString();
+                })
+                    .toString()
+                    .trim();
             }
             catch (e3) {
                 core.debug(`third attempt failed: ${e3.message}`);
@@ -70,16 +76,8 @@ function getAffectedApps({ base = '', head = '', workspace }) {
         return [];
     }
     core.info(`BOOM... ${JSON.stringify(result)}`);
-    if (!result.includes('Affected apps:')) {
-        throw Error(`NX Command Failed: ${result}`);
-    }
-    const apps = result
-        .split('Affected apps:')[1]
-        .trim()
-        .split('- ')
-        .map(x => x.trim())
-        .filter(x => x.length > 0);
-    return apps || [];
+    const apps = result.split(' ');
+    return apps;
 }
 exports.getAffectedApps = getAffectedApps;
 
