@@ -7,24 +7,20 @@ export async function run(workspace = '.'): Promise<void> {
     const base = core.getInput('base');
     const head = core.getInput('head');
 
-    // save base and head to env for later steps
     core.exportVariable('NX_BASE', base || 'HEAD~1');
     core.exportVariable('NX_HEAD', head || 'HEAD');
 
-    core.info(`Getting diff from ${base} to ${head || 'HEAD'}...`);
-    core.info(`using dir: ${GITHUB_WORKSPACE}`);
+    core.info(`Getting diff from ${base || 'default BASE branch'} to ${head || 'HEAD'}...`);
+    core.info(`Using dir: ${GITHUB_WORKSPACE}...`);
 
-    const apps = getAffectedApps({
+    const affectedApps = getAffectedApps({
       base,
       head,
       workspace: GITHUB_WORKSPACE,
     });
 
-    const appsString = JSON.stringify(apps);
-
-    core.setOutput('affected_apps', appsString);
-    core.exportVariable('NX_AFFECTED_APPS', appsString);
-    core.info(`Found these affected apps: \n ${appsString}`);
+    core.setOutput('affected_apps', affectedApps);
+    core.exportVariable('NX_AFFECTED_APPS', affectedApps);
   } catch (error) {
     core.setFailed(error.message);
   }
