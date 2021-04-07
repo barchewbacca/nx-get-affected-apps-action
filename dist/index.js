@@ -99,7 +99,7 @@ function run() {
                 base,
                 head,
             });
-            core.setOutput('affected_apps', affectedApps);
+            core.setOutput('affected_apps', { apps: affectedApps });
             core.exportVariable('NX_AFFECTED_APPS', affectedApps);
         }
         catch (error) {
