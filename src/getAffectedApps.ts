@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function getAffectedApps({ base = '', head = '', workspace }: Props): string[] {
-  const args = `--base=${base} --plain`;
+  const args = `--base=${base} --head=${head} --plain`;
   let result;
 
   try {

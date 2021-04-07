@@ -2,12 +2,12 @@ name: 'Nx get affected apps action'
 description: '"Determines the affected apps in an Nx workspace'
 inputs:
   base:
-    description: 'SHA to compare to'
-    default: 'origin/master~1'
+    description: 'SHA to compare from'
+    default: 'origin/main'
     required: false
   head:
-    description: 'SHA to compare from'
-    default: 'origin/master'
+    description: 'SHA to compare to'
+    default: 'origin/main~1'
     required: false
 outputs:
   affected_apps:
