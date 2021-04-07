@@ -18,11 +18,11 @@ export function getAffectedApps({ base = '', head = '', workspace }: ActionParam
       .trim();
   } catch (error) {
     core.info(`Running the Nx CLI failed with the error: ${error.message}`);
-    throw Error('Could not run the Nx CLI...');
+    throw Error('Could not run the Nx CLI');
   }
 
   if (!affectedApps) {
-    core.info('No apps were touched by the changes...');
+    core.info('No apps were touched by the changes');
     return [];
   }
 

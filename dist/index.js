@@ -41,10 +41,10 @@ function getAffectedApps({ base = '', head = '', workspace }) {
     }
     catch (error) {
         core.info(`Running the Nx CLI failed with the error: ${error.message}`);
-        throw Error('Could not run the Nx CLI...');
+        throw Error('Could not run the Nx CLI');
     }
     if (!affectedApps) {
-        core.info('No apps were touched by the changes...');
+        core.info('No apps were touched by the changes');
         return [];
     }
     core.info(`Following apps were affected by the changes:\n${affectedApps}`);
@@ -95,12 +95,13 @@ function run(workspace = '.') {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { GITHUB_WORKSPACE = workspace } = process.env;
+            core.info(`Check ${process.env.GITHUB_WORKSPACE}`);
             const base = core.getInput('base');
             const head = core.getInput('head');
             core.exportVariable('NX_BASE', base || 'HEAD~1');
             core.exportVariable('NX_HEAD', head || 'HEAD');
-            core.info(`Getting diff from ${base || 'default BASE branch'} to ${head || 'HEAD'}...`);
-            core.info(`Using dir: ${GITHUB_WORKSPACE}...`);
+            core.info(`Getting diff from ${base || 'HEAD~1'} to ${head || 'HEAD'}`);
+            core.info(`Using dir: ${GITHUB_WORKSPACE}`);
             const affectedApps = getAffectedApps_1.getAffectedApps({
                 base,
                 head,
