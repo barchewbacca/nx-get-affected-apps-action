@@ -9,14 +9,6 @@ inputs:
     description: 'SHA to compare to'
     default: 'origin/main~1'
     required: false
-  registry:
-    description: 'Docker registry where the image belongs to'
-    default: 'gcr.io/ingka-dsm-portal-dev'
-    required: false
-  version:
-    description: 'Version of the Docker image'
-    default: 'v1.0.0'
-    required: false
 outputs:
   affected_apps:
     description: 'an array of affected app names'
