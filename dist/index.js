@@ -86,12 +86,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__webpack_require__(186));
+const child_process_1 = __webpack_require__(129);
 const getAffectedApps_1 = __webpack_require__(744);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const base = core.getInput('base');
             const head = core.getInput('head');
+            const registry = core.getInput('registry');
+            const version = core.getInput('version');
             core.exportVariable('NX_BASE', base || 'HEAD~1');
             core.exportVariable('NX_HEAD', head || 'HEAD');
             core.info(`Getting diff from ${base || 'HEAD~1'} to ${head || 'HEAD'}`);
@@ -101,6 +104,9 @@ function run() {
             });
             core.setOutput('affected_apps', { apps: affectedApps });
             core.exportVariable('NX_AFFECTED_APPS', affectedApps);
+            for (const app of affectedApps) {
+                child_process_1.execSync(`docker build -t ${registry}/${app}:${version} --build-arg APP=${app} .`);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
