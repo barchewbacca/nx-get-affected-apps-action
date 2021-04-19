@@ -26,10 +26,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAffectedApps = void 0;
 const core = __importStar(__webpack_require__(186));
 const child_process_1 = __webpack_require__(129);
+const directory_tree_1 = __importDefault(__webpack_require__(605));
 function getAffectedApps({ base = '', head = '' }) {
     let affectedApps;
     try {
@@ -44,7 +48,9 @@ function getAffectedApps({ base = '', head = '' }) {
         return [];
     }
     core.info(`Following apps were affected by the changes:\n${affectedApps}`);
-    return affectedApps.split(' ');
+    const apps = affectedApps.split(' ');
+    core.info(`Directory tree: ${JSON.stringify(directory_tree_1.default('.'))}`);
+    return apps;
 }
 exports.getAffectedApps = getAffectedApps;
 
@@ -499,6 +505,126 @@ function toCommandValue(input) {
 }
 exports.toCommandValue = toCommandValue;
 //# sourceMappingURL=utils.js.map
+
+/***/ }),
+
+/***/ 605:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+const FS = __webpack_require__(747);
+const PATH = __webpack_require__(622);
+const constants = {
+	DIRECTORY: 'directory',
+	FILE: 'file'
+}
+
+function safeReadDirSync (path) {
+	let dirData = {};
+	try {
+		dirData = FS.readdirSync(path);
+	} catch(ex) {
+		if (ex.code == "EACCES" || ex.code == "EPERM") {
+			//User does not have permissions, ignore directory
+			return null;
+		}
+		else throw ex;
+	}
+	return dirData;
+}
+
+/**
+ * Normalizes windows style paths by replacing double backslahes with single forward slahes (unix style).
+ * @param  {string} path
+ * @return {string}
+ */
+function normalizePath(path) {
+	return path.replace(/\\/g, '/');
+}
+
+/**
+ * Tests if the supplied parameter is of type RegExp
+ * @param  {any}  regExp
+ * @return {Boolean}
+ */
+function isRegExp(regExp) {
+	return typeof regExp === "object" && regExp.constructor == RegExp;
+}
+
+/**
+ * Collects the files and folders for a directory path into an Object, subject
+ * to the options supplied, and invoking optional
+ * @param  {String} path
+ * @param  {Object} options
+ * @param  {function} onEachFile
+ * @param  {function} onEachDirectory
+ * @return {Object}
+ */
+function directoryTree (path, options, onEachFile, onEachDirectory) {
+	const name = PATH.basename(path);
+	path = options && options.normalizePath ? normalizePath(path) : path;
+	const item = { path, name };
+	let stats;
+
+	try { stats = FS.statSync(path); }
+	catch (e) { return null; }
+
+	// Skip if it matches the exclude regex
+	if (options && options.exclude) {
+		const excludes =  isRegExp(options.exclude) ? [options.exclude] : options.exclude;
+		if (excludes.some((exclusion) => exclusion.test(path))) {
+			return null;
+		}
+	}
+
+	if (stats.isFile()) {
+
+		const ext = PATH.extname(path).toLowerCase();
+
+		// Skip if it does not match the extension regex
+		if (options && options.extensions && !options.extensions.test(ext))
+			return null;
+
+		item.size = stats.size;  // File size in bytes
+		item.extension = ext;
+		item.type = constants.FILE;
+
+		if (options && options.attributes) {
+			options.attributes.forEach((attribute) => {
+				item[attribute] = stats[attribute];
+			});
+		}
+
+		if (onEachFile) {
+			onEachFile(item, path, stats);
+		}
+	}
+	else if (stats.isDirectory()) {
+		let dirData = safeReadDirSync(path);
+		if (dirData === null) return null;
+
+		if (options && options.attributes) {
+			options.attributes.forEach((attribute) => {
+				item[attribute] = stats[attribute];
+			});
+		}
+		item.children = dirData
+			.map(child => directoryTree(PATH.join(path, child), options, onEachFile, onEachDirectory))
+			.filter(e => !!e);
+		item.size = item.children.reduce((prev, cur) => prev + cur.size, 0);
+		item.type = constants.DIRECTORY;
+		if (onEachDirectory) {
+			onEachDirectory(item, path, stats);
+		}
+	} else {
+		return null; // Or set item.size = 0 for devices, FIFO and sockets ?
+	}
+	return item;
+}
+
+module.exports = directoryTree;
+
 
 /***/ }),
 
