@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import { execSync } from 'child_process';
+import directoryTree from 'directory-tree';
 
 interface ActionParams {
   base?: string;
@@ -22,5 +23,7 @@ export function getAffectedApps({ base = '', head = '' }: ActionParams): string[
   }
 
   core.info(`Following apps were affected by the changes:\n${affectedApps}`);
-  return affectedApps.split(' ');
+  const apps = affectedApps.split(' ');
+  core.info(`Directory tree: ${JSON.stringify(directoryTree('.'))}`);
+  return apps;
 }
