@@ -49,7 +49,7 @@ function getAffectedApps({ base = '', head = '' }) {
     }
     core.info(`Following apps were affected by the changes:\n${affectedApps}`);
     const apps = affectedApps.split(' ');
-    core.info(`Directory tree: ${JSON.stringify(directory_tree_1.default('.'))}`);
+    core.info(`Directory tree: ${JSON.stringify(directory_tree_1.default('./dist'))}`);
     return apps;
 }
 exports.getAffectedApps = getAffectedApps;

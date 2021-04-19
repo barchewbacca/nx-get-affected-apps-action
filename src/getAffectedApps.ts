@@ -24,6 +24,6 @@ export function getAffectedApps({ base = '', head = '' }: ActionParams): string[
 
   core.info(`Following apps were affected by the changes:\n${affectedApps}`);
   const apps = affectedApps.split(' ');
-  core.info(`Directory tree: ${JSON.stringify(directoryTree('.'))}`);
+  core.info(`Directory tree: ${JSON.stringify(directoryTree('./dist'))}`);
   return apps;
 }
