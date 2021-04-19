@@ -50,6 +50,10 @@ function getAffectedApps({ base = '', head = '' }) {
     core.info(`Following apps were affected by the changes:\n${affectedApps}`);
     const apps = affectedApps.split(' ');
     core.info(`Directory tree: ${JSON.stringify(directory_tree_1.default('./dist'))}`);
+    for (const app of apps) {
+        child_process_1.execSync(`docker build -t gcr.io/ingka-dsm-portal-dev/${app}:test --build-arg APP=${app} . `);
+        child_process_1.execSync(`docker push gcr.io/ingka-dsm-portal-dev/${app}:test`);
+    }
     return apps;
 }
 exports.getAffectedApps = getAffectedApps;
