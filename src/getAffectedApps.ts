@@ -1,5 +1,4 @@
 import * as core from '@actions/core';
-import * as chalk from 'chalk';
 import { execSync } from 'child_process';
 
 interface ActionParams {
@@ -30,11 +29,11 @@ export function getAffectedApps({ base = '', head = '', registry, tag }: ActionP
   const imageTag = tag || head.substring(0, 8);
 
   for (const app of affectedAppsList) {
-    core.info(chalk.blue(`Creating a docker image for the ${app} application.`));
+    core.info(`Creating a docker image for the ${app} application.`);
     execSync(`docker build -t ${registry}/${app}:${imageTag} --build-arg APP=${app} . `, {
       stdio: 'inherit',
     });
-    core.info(chalk.blue(`Pushing the ${app}:${imageTag} docker image to the ${registry} container registry.`));
+    core.info(`Pushing the ${app}:${imageTag} docker image to the ${registry} container registry.`);
     execSync(`docker push ${registry}/${app}:${imageTag}`, { stdio: 'inherit' });
   }
 
