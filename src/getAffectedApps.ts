@@ -26,8 +26,8 @@ export function getAffectedApps({ base = '', head = '' }: ActionParams): string[
   const apps = affectedApps.split(' ');
   core.info(`Directory tree: ${JSON.stringify(directoryTree('./dist'))}`);
   for (const app of apps) {
-    execSync(`docker build -t gcr.io/ingka-dsm-portal-dev/${app}:test --build-arg APP=${app} . `);
-    execSync(`docker push gcr.io/ingka-dsm-portal-dev/${app}:test`);
+    execSync(`docker build -t gcr.io/ingka-dsm-portal-dev/${app}:test --build-arg APP=${app} . `, { stdio: 'inherit' });
+    execSync(`docker push gcr.io/ingka-dsm-portal-dev/${app}:test`, { stdio: 'inherit' });
   }
 
   return apps;
