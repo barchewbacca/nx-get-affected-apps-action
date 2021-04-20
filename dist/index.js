@@ -70,7 +70,7 @@ exports.getAffectedApps = getAffectedApps;
 function deployApp(url, req) {
     child_process_1.execSync(`curl --location --request GET '${url}' \
     --header 'Content-Type: application/json' \
-    --data-raw ${req}`, { stdio: 'inherit' });
+    --data-raw ${JSON.stringify(req)}`, { stdio: 'inherit' });
 }
 
 

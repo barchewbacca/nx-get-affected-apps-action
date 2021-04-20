@@ -66,7 +66,7 @@ function deployApp(url: string, req: DeploymentManagerRequest): void {
   execSync(
     `curl --location --request GET '${url}' \
     --header 'Content-Type: application/json' \
-    --data-raw ${req}`,
+    --data-raw ${JSON.stringify(req)}`,
     { stdio: 'inherit' }
   );
 }
