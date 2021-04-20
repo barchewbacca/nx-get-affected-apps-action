@@ -9,6 +9,12 @@ inputs:
     description: 'SHA to compare to'
     default: 'origin/main~1'
     required: false
+  registry:
+    description: 'Container registry where the image needs to be pushed.'
+    required: true
+  tag:
+    description: 'The tag that needs to be added to the docker image.'
+    required: false
 outputs:
   affected_apps:
     description: 'an array of affected app names'

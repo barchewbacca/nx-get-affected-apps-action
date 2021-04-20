@@ -5,6 +5,8 @@ export async function run(): Promise<void> {
   try {
     const base = core.getInput('base');
     const head = core.getInput('head');
+    const registry = core.getInput('registry');
+    const tag = core.getInput('tag');
 
     core.exportVariable('NX_BASE', base || 'HEAD~1');
     core.exportVariable('NX_HEAD', head || 'HEAD');
@@ -14,6 +16,8 @@ export async function run(): Promise<void> {
     const affectedApps = getAffectedApps({
       base,
       head,
+      registry,
+      tag,
     });
 
     core.setOutput('affected_apps', affectedApps);
