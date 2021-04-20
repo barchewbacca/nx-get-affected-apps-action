@@ -15,9 +15,33 @@ inputs:
   tag:
     description: 'The tag that needs to be added to the docker image.'
     required: false
-outputs:
-  affected_apps:
-    description: 'an array of affected app names'
+  deploymentManagerURL:
+    description: 'The URL of the deployment manager.'
+    required: true
+  dockerAuth:
+    description: 'The docker auth.'
+    required: true
+  vaultUrl:
+    description: 'The URL of the Vault.'
+    required: true
+  vaultRoleId:
+    description: 'The RoleID of the Vault.'
+    required: true
+  vaultSecretId:
+    description: 'The SecretID of the Vault.'
+    required: true
+  vaultNamespace:
+    description: 'The Vault namespace.'
+    required: true
+  vaultKeyPath:
+    description: 'The KeyPath of the Vault.'
+    required: true
+  vaultSecretName:
+    description: 'The SecretName of the Vault.'
+    required: true
+  vaultAuthMethod:
+    description: 'The AuthMethod of the Vault.'
+    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'

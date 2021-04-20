@@ -30,7 +30,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAffectedApps = void 0;
 const core = __importStar(__webpack_require__(186));
 const child_process_1 = __webpack_require__(129);
-function getAffectedApps({ base = '', head = '', registry, tag }) {
+function getAffectedApps({ base = '', head = '', deploymentManagerUrl, registry, tag, dockerAuth, secrets, }) {
     let affectedApps;
     try {
         affectedApps = child_process_1.execSync(`npx nx affected:apps --base=${base} --head=${head} --plain`).toString().trim();
@@ -45,18 +45,33 @@ function getAffectedApps({ base = '', head = '', registry, tag }) {
     }
     core.info(`Following apps were affected by the changes:\n${affectedApps}`);
     const affectedAppsList = affectedApps.split(' ');
-    const imageTag = tag || head.substring(0, 8);
+    const dockerTag = tag || head.substring(0, 8);
     for (const app of affectedAppsList) {
         core.info(`Creating a docker image for the ${app} application.`);
-        child_process_1.execSync(`docker build -t ${registry}/${app}:${imageTag} --build-arg APP=${app} . `, {
+        child_process_1.execSync(`docker build -t ${registry}/${app}:${dockerTag} --build-arg APP=${app} . `, {
             stdio: 'inherit',
         });
-        core.info(`Pushing the ${app}:${imageTag} docker image to the ${registry} container registry.`);
-        child_process_1.execSync(`docker push ${registry}/${app}:${imageTag}`, { stdio: 'inherit' });
+        core.info(`Pushing the ${app}:${dockerTag} docker image to the ${registry} container registry.`);
+        child_process_1.execSync(`docker push ${registry}/${app}:${dockerTag}`, { stdio: 'inherit' });
+        const req = {
+            docker: {
+                ImageName: `${registry}/${app}`,
+                DockerAuth: dockerAuth,
+                ContainerName: app,
+                DockerTag: dockerTag,
+            },
+            secrets,
+        };
+        deployApp(deploymentManagerUrl, req);
     }
     return affectedAppsList;
 }
 exports.getAffectedApps = getAffectedApps;
+function deployApp(url, req) {
+    child_process_1.execSync(`curl --location --request GET '${url}' \
+    --header 'Content-Type: application/json' \
+    --data-raw ${req}`, { stdio: 'inherit' });
+}
 
 
 /***/ }),
@@ -104,17 +119,34 @@ function run() {
             const head = core.getInput('head');
             const registry = core.getInput('registry');
             const tag = core.getInput('tag');
-            core.exportVariable('NX_BASE', base || 'HEAD~1');
-            core.exportVariable('NX_HEAD', head || 'HEAD');
+            const deploymentManagerUrl = core.getInput('deploymentManagerUrl');
+            const dockerAuth = core.getInput('dockerAuth');
+            const vaultUrl = core.getInput('vaultUrl');
+            const vaultRoleId = core.getInput('vaultRoleId');
+            const vaultSecretId = core.getInput('vaultSecretId');
+            const vaultNamespace = core.getInput('vaultNamespace');
+            const vaultKeyPath = core.getInput('vaultKeyPath');
+            const vaultSecretName = core.getInput('vaultSecretName');
+            const vaultAuthMethod = core.getInput('vaultAuthMethod');
             core.info(`Getting diff from ${base || 'HEAD~1'} to ${head || 'HEAD'}`);
-            const affectedApps = getAffectedApps_1.getAffectedApps({
+            const secrets = {
+                VaultRoleID: vaultRoleId,
+                VaultSecretID: vaultSecretId,
+                VaultNameSpace: vaultNamespace,
+                VaultURL: vaultUrl,
+                VaultKeyPath: vaultKeyPath,
+                VaultSecretName: vaultSecretName,
+                VaultAuthMethod: vaultAuthMethod,
+            };
+            getAffectedApps_1.getAffectedApps({
                 base,
                 head,
+                deploymentManagerUrl,
                 registry,
                 tag,
+                dockerAuth,
+                secrets,
             });
-            core.setOutput('affected_apps', affectedApps);
-            core.exportVariable('NX_AFFECTED_APPS', affectedApps);
         }
         catch (error) {
             core.setFailed(error.message);
