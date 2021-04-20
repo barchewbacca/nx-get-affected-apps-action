@@ -68,9 +68,10 @@ function getAffectedApps({ base = '', head = '', deploymentManagerUrl, registry,
 }
 exports.getAffectedApps = getAffectedApps;
 function deployApp(url, req) {
+    core.info(`Test ${JSON.stringify(req)}`);
     child_process_1.execSync(`curl --location --request GET '${url}' \
     --header 'Content-Type: application/json' \
-    --data-raw ${JSON.stringify(req)}`, { stdio: 'inherit' });
+    --data-raw '${JSON.stringify(req)}'`, { stdio: 'inherit' });
 }
 
 

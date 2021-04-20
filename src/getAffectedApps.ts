@@ -63,10 +63,11 @@ export function getAffectedApps({
 }
 
 function deployApp(url: string, req: DeploymentManagerRequest): void {
+  core.info(`Test ${JSON.stringify(req)}`);
   execSync(
     `curl --location --request GET '${url}' \
     --header 'Content-Type: application/json' \
-    --data-raw ${JSON.stringify(req)}`,
+    --data-raw '${JSON.stringify(req)}'`,
     { stdio: 'inherit' }
   );
 }
