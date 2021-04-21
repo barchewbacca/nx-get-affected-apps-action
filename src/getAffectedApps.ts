@@ -43,7 +43,7 @@ export function getAffectedApps({
 
   for (const app of affectedAppsList) {
     core.info(`Creating a docker image for the ${app} application.`);
-    execSync(`docker build -t ${registry}/${app}:${dockerTag} --build-arg APP=${app} . `, {
+    execSync(`docker build -t ${registry}/dsm-${app}:${dockerTag} --build-arg APP=${app} . `, {
       stdio: 'inherit',
     });
     core.info(`Pushing the ${app}:${dockerTag} docker image to the ${registry} container registry.`);

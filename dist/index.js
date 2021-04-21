@@ -49,7 +49,7 @@ function getAffectedApps({ base = '', head = '', deploymentManagerUrl, registry,
     const dockerTag = tag || head.substring(0, 8);
     for (const app of affectedAppsList) {
         core.info(`Creating a docker image for the ${app} application.`);
-        child_process_1.execSync(`docker build -t ${registry}/${app}:${dockerTag} --build-arg APP=${app} . `, {
+        child_process_1.execSync(`docker build -t ${registry}/dsm-${app}:${dockerTag} --build-arg APP=${app} . `, {
             stdio: 'inherit',
         });
         core.info(`Pushing the ${app}:${dockerTag} docker image to the ${registry} container registry.`);
