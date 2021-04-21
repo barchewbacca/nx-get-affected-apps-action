@@ -53,10 +53,10 @@ function getAffectedApps({ base = '', head = '', deploymentManagerUrl, registry,
             stdio: 'inherit',
         });
         core.info(`Pushing the ${app}:${dockerTag} docker image to the ${registry} container registry.`);
-        child_process_1.execSync(`docker push ${registry}/${app}:${dockerTag}`, { stdio: 'inherit' });
+        child_process_1.execSync(`docker push ${registry}/dsm-${app}:${dockerTag}`, { stdio: 'inherit' });
         const req = {
             docker: {
-                ImageName: `${registry}/${app}`,
+                ImageName: `${registry}/dsm-${app}`,
                 DockerAuth: dockerAuth,
                 ContainerName: app,
                 DockerTag: dockerTag,
