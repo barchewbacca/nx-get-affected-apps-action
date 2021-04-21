@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import axios from 'axios';
 import { execSync } from 'child_process';
 import { DeploymentManagerRequest, DeploymentManagerSecrets } from './main';
 
@@ -64,10 +65,17 @@ export function getAffectedApps({
 
 function deployApp(url: string, req: DeploymentManagerRequest): void {
   core.info(`Test ${JSON.stringify(req)}`);
-  execSync(
-    `curl --location --request GET '${url}' \
-    --header 'Content-Type: application/json' \
-    --data-raw '${JSON.stringify(req)}'`,
-    { stdio: 'inherit' }
-  );
+  axios
+    .get(url, {
+      params: req,
+      headers: { 'Content-Type': 'application/json' },
+    })
+    .then(x => core.info(`Success: ${x}`))
+    .catch(x => core.info(`Failed: ${x}`));
+  // execSync(
+  //   `curl --location --request GET '${url}' \
+  //   --header 'Content-Type: application/json' \
+  //   --data-raw '${JSON.stringify(req)}'`,
+  //   { stdio: 'inherit' }
+  // );
 }
