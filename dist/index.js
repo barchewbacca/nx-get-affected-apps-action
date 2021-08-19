@@ -29,9 +29,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAffectedApps = void 0;
 const core = __importStar(__webpack_require__(186));
-// import axios from 'axios';
 const child_process_1 = __webpack_require__(129);
-function getAffectedApps({ base = '', head = '', deploymentManagerUrl, registry, tag, dockerAuth, secrets, }) {
+function getAffectedApps({ base = '', head = '' }) {
     let affectedApps;
     try {
         affectedApps = child_process_1.execSync(`npx nx affected:apps --base=${base} --head=${head} --plain`).toString().trim();
@@ -46,41 +45,9 @@ function getAffectedApps({ base = '', head = '', deploymentManagerUrl, registry,
     }
     core.info(`Following apps were affected by the changes:\n${affectedApps}`);
     const affectedAppsList = affectedApps.split(' ');
-    const dockerTag = tag || head.substring(0, 8);
-    for (const app of affectedAppsList) {
-        core.info(`Creating a docker image for the ${app} application.`);
-        child_process_1.execSync(`docker build -t ${registry}/dsm-${app}:${dockerTag} --build-arg APP=${app} . `, {
-            stdio: 'inherit',
-        });
-        core.info(`Pushing the ${app}:${dockerTag} docker image to the ${registry} container registry.`);
-        child_process_1.execSync(`docker push ${registry}/dsm-${app}:${dockerTag}`, { stdio: 'inherit' });
-        const req = {
-            docker: {
-                ImageName: `${registry}/dsm-${app}`,
-                DockerAuth: dockerAuth,
-                ContainerName: app,
-                DockerTag: dockerTag,
-            },
-            secrets,
-        };
-        deployApp(deploymentManagerUrl, req);
-    }
     return affectedAppsList;
 }
 exports.getAffectedApps = getAffectedApps;
-function deployApp(url, req) {
-    core.info(`Test ${JSON.stringify(req)}`);
-    // axios
-    //   .get(url, {
-    //     params: req,
-    //     headers: { 'Content-Type': 'application/json' },
-    //   })
-    //   .then(x => core.info(`Success: ${x}`))
-    //   .catch(x => core.info(`Failed: ${x}`));
-    child_process_1.execSync(`curl --location --request GET '${url}' \
-    --header 'Content-Type: application/json' \
-    --data-raw '${JSON.stringify(req)}'`, { stdio: 'inherit' });
-}
 
 
 /***/ }),
@@ -126,36 +93,12 @@ function run() {
         try {
             const base = core.getInput('base');
             const head = core.getInput('head');
-            const registry = core.getInput('registry');
-            const tag = core.getInput('tag');
-            const deploymentManagerUrl = core.getInput('deploymentManagerUrl');
-            const dockerAuth = core.getInput('dockerAuth');
-            const vaultUrl = core.getInput('vaultUrl');
-            const vaultRoleId = core.getInput('vaultRoleId');
-            const vaultSecretId = core.getInput('vaultSecretId');
-            const vaultNamespace = core.getInput('vaultNamespace');
-            const vaultKeyPath = core.getInput('vaultKeyPath');
-            const vaultSecretName = core.getInput('vaultSecretName');
-            const vaultAuthMethod = core.getInput('vaultAuthMethod');
             core.info(`Getting diff from ${base || 'HEAD~1'} to ${head || 'HEAD'}`);
-            const secrets = {
-                VaultRoleID: vaultRoleId,
-                VaultSecretID: vaultSecretId,
-                VaultNameSpace: vaultNamespace,
-                VaultURL: vaultUrl,
-                VaultKeyPath: vaultKeyPath,
-                VaultSecretName: vaultSecretName,
-                VaultAuthMethod: vaultAuthMethod,
-            };
-            getAffectedApps_1.getAffectedApps({
+            const affectedApps = getAffectedApps_1.getAffectedApps({
                 base,
                 head,
-                deploymentManagerUrl,
-                registry,
-                tag,
-                dockerAuth,
-                secrets,
             });
+            core.exportVariable('NX_AFFECTED_APPS', affectedApps);
         }
         catch (error) {
             core.setFailed(error.message);
