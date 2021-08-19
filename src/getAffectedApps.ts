@@ -1,27 +1,12 @@
 import * as core from '@actions/core';
-// import axios from 'axios';
 import { execSync } from 'child_process';
-import { DeploymentManagerRequest, DeploymentManagerSecrets } from './main';
 
 interface ActionParams {
   base?: string;
   head?: string;
-  deploymentManagerUrl: string;
-  registry: string;
-  tag?: string;
-  dockerAuth: string;
-  secrets: DeploymentManagerSecrets;
 }
 
-export function getAffectedApps({
-  base = '',
-  head = '',
-  deploymentManagerUrl,
-  registry,
-  tag,
-  dockerAuth,
-  secrets,
-}: ActionParams): string[] {
+export function getAffectedApps({ base = '', head = '' }: ActionParams): string[] {
   let affectedApps: string;
 
   try {
@@ -39,43 +24,6 @@ export function getAffectedApps({
   core.info(`Following apps were affected by the changes:\n${affectedApps}`);
 
   const affectedAppsList = affectedApps.split(' ');
-  const dockerTag = tag || head.substring(0, 8);
-
-  for (const app of affectedAppsList) {
-    core.info(`Creating a docker image for the ${app} application.`);
-    execSync(`docker build -t ${registry}/dsm-${app}:${dockerTag} --build-arg APP=${app} . `, {
-      stdio: 'inherit',
-    });
-    core.info(`Pushing the ${app}:${dockerTag} docker image to the ${registry} container registry.`);
-    execSync(`docker push ${registry}/dsm-${app}:${dockerTag}`, { stdio: 'inherit' });
-    const req: DeploymentManagerRequest = {
-      docker: {
-        ImageName: `${registry}/dsm-${app}`,
-        DockerAuth: dockerAuth,
-        ContainerName: app,
-        DockerTag: dockerTag,
-      },
-      secrets,
-    };
-    deployApp(deploymentManagerUrl, req);
-  }
 
   return affectedAppsList;
-}
-
-function deployApp(url: string, req: DeploymentManagerRequest): void {
-  core.info(`Test ${JSON.stringify(req)}`);
-  // axios
-  //   .get(url, {
-  //     params: req,
-  //     headers: { 'Content-Type': 'application/json' },
-  //   })
-  //   .then(x => core.info(`Success: ${x}`))
-  //   .catch(x => core.info(`Failed: ${x}`));
-  execSync(
-    `curl --location --request GET '${url}' \
-    --header 'Content-Type: application/json' \
-    --data-raw '${JSON.stringify(req)}'`,
-    { stdio: 'inherit' }
-  );
 }
