@@ -22,5 +22,8 @@ export function getAffectedApps({ base = '', head = '' }: ActionParams): string[
   }
 
   core.info(`Following apps were affected by the changes:\n${affectedApps}`);
-  return affectedApps.split(' ');
+
+  const affectedAppsList = affectedApps.split(' ');
+
+  return affectedAppsList;
 }

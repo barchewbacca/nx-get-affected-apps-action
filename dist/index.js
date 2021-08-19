@@ -44,7 +44,8 @@ function getAffectedApps({ base = '', head = '' }) {
         return [];
     }
     core.info(`Following apps were affected by the changes:\n${affectedApps}`);
-    return affectedApps.split(' ');
+    const affectedAppsList = affectedApps.split(' ');
+    return affectedAppsList;
 }
 exports.getAffectedApps = getAffectedApps;
 
@@ -92,14 +93,11 @@ function run() {
         try {
             const base = core.getInput('base');
             const head = core.getInput('head');
-            core.exportVariable('NX_BASE', base || 'HEAD~1');
-            core.exportVariable('NX_HEAD', head || 'HEAD');
             core.info(`Getting diff from ${base || 'HEAD~1'} to ${head || 'HEAD'}`);
             const affectedApps = getAffectedApps_1.getAffectedApps({
                 base,
                 head,
             });
-            core.setOutput('affected_apps', affectedApps);
             core.exportVariable('NX_AFFECTED_APPS', affectedApps);
         }
         catch (error) {
