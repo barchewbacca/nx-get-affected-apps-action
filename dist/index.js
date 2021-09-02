@@ -30,22 +30,24 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAffectedApps = void 0;
 const core = __importStar(__webpack_require__(186));
 const child_process_1 = __webpack_require__(129);
-function getAffectedApps({ base = '', head = '' }) {
-    let affectedApps;
+function getAffectedApps({ base = '', head = '', exclude = '' }) {
     try {
-        affectedApps = child_process_1.execSync(`npx nx affected:apps --base=${base} --head=${head} --plain`).toString().trim();
+        const affectedApps = child_process_1.execSync(`npx nx affected:apps --base=${base} --head=${head} --plain --exclude=${exclude}`)
+            .toString()
+            .trim();
+        // eslint-disable-next-line no-console
+        console.log('Exclude', exclude);
+        if (!affectedApps) {
+            core.info('No apps were touched by the changes');
+            return '';
+        }
+        core.info(`Following apps were affected by the changes:\n${affectedApps}`);
+        return affectedApps.replace(/\s+/g, ',');
     }
     catch (error) {
         core.info(`Running the Nx CLI failed with the error: ${error.message}`);
         throw Error('Could not run the Nx CLI');
     }
-    if (!affectedApps) {
-        core.info('No apps were touched by the changes');
-        return [];
-    }
-    core.info(`Following apps were affected by the changes:\n${affectedApps}`);
-    const affectedAppsList = affectedApps.split(' ');
-    return affectedAppsList;
 }
 exports.getAffectedApps = getAffectedApps;
 
@@ -91,12 +93,14 @@ const getAffectedApps_1 = __webpack_require__(744);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const base = core.getInput('base');
+            const base = parse(core.getInput('base'));
             const head = core.getInput('head');
-            core.info(`Getting diff from ${base || 'HEAD~1'} to ${head || 'HEAD'}`);
+            const exclude = core.getInput('head');
+            core.info(`Getting diff from ${base} to ${head}`);
             const affectedApps = getAffectedApps_1.getAffectedApps({
                 base,
                 head,
+                exclude,
             });
             core.exportVariable('NX_AFFECTED_APPS', affectedApps);
         }
@@ -106,6 +110,10 @@ function run() {
     });
 }
 exports.run = run;
+function parse(base) {
+    const isFirstCommit = base === '0000000000000000000000000000000000000000';
+    return isFirstCommit ? 'origin/main' : base;
+}
 run();
 
 

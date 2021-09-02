@@ -9,6 +9,9 @@ inputs:
     description: 'SHA to compare to'
     default: 'origin/main~1'
     required: false
+  exclude:
+    description: 'List of applications that need to be excluded'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
