@@ -5,7 +5,7 @@ export async function run(): Promise<void> {
   try {
     const base = parse(core.getInput('base'));
     const head = core.getInput('head');
-    const exclude = core.getInput('head');
+    const exclude = core.getInput('exclude');
 
     core.info(`Getting diff from ${base} to ${head}`);
 
