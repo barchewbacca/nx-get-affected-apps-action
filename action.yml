@@ -1,5 +1,5 @@
 name: 'Nx get affected apps action'
-description: '"Determines the affected apps in an Nx workspace'
+description: 'Determines the affected apps in an Nx workspace'
 inputs:
   base:
     description: 'SHA to compare from'
@@ -10,7 +10,7 @@ inputs:
     default: 'origin/main~1'
     required: false
   exclude:
-    description: 'List of applications that need to be excluded'
+    description: 'Comma-separated list of applications that need to be excluded'
     required: false
 runs:
   using: 'node12'

@@ -35,8 +35,6 @@ function getAffectedApps({ base = '', head = '', exclude = '' }) {
         const affectedApps = child_process_1.execSync(`npx nx affected:apps --base=${base} --head=${head} --plain --exclude=${exclude}`)
             .toString()
             .trim();
-        // eslint-disable-next-line no-console
-        console.log('Exclude', exclude);
         if (!affectedApps) {
             core.info('No apps were touched by the changes');
             return '';
