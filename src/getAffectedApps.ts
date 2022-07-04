@@ -20,7 +20,7 @@ export function getAffectedApps({ base = '', head = '', exclude = '' }: ActionPa
 
     core.info(`Following apps were affected by the changes:\n${affectedApps}`);
 
-    return affectedApps.replace(/\s+/g, ',');
+    return affectedApps.replace(/\s+/g, ',').replace(/([a-z]+)/g, '"$1"');
   } catch (error) {
     core.info(`Running the Nx CLI failed with the error: ${error.message}`);
     throw Error('Could not run the Nx CLI');
